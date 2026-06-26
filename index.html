@@ -1,0 +1,1493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Colorlib + STARTUP2 Preview Clone</title>
+    
+    <!-- Bootstrap 5.3.3 CSS Core CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+    
+    <!-- Font Awesome Utility Icons CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous">
+    
+    <style>
+        /* Base Setup resets */
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            background-color:whitesmoke !important;
+            overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        /* ==========================================================================
+           COLORLIB TOP PREVIEW HEADER STATE BAR
+           ========================================================================== */
+        .colorlib-preview-bar {
+            background-color: #111111;
+            height: 65px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            border-bottom: 1px solid #2d2d2d;
+            z-index: 2000;
+            position: relative;
+        }
+
+        .left-logo-area {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .cl-logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: #ffffff;
+            text-decoration: none;
+        }
+        .cl-logo span {
+            color: #7bc043;
+        }
+
+        .task-tag {
+            background-color: whitesmoke;
+            color: #aaaaaa;
+            border: 1px solid #333333;
+            padding: 6px 14px;
+            font-size: 13px;
+            font-weight: 600;
+            border-radius: 4px;
+            text-transform: uppercase;
+        }
+
+        /* Right Side Content Master Container */
+        .right-side-controls {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .device-switcher {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .device-btn {
+            background: none;
+            border: none;
+            color: #666666;
+            font-size: 18px;
+            padding: 10px 14px;
+            cursor: pointer;
+            transition: color 0.2s, background-color 0.2s;
+            border-radius: 4px;
+        }
+
+        .device-btn:hover, .device-btn.active {
+            color: #ffffff;
+            background-color: #222222;
+        }
+
+        .right-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .heart-wrapper {
+            position: relative;
+            cursor: pointer;
+            display: inline-block;
+        }
+
+        .heart-icon {
+            color: #888888;
+            transition: color 0.3s ease;
+        }
+        
+        .heart-wrapper.liked .heart-icon {
+            color: #ff4d4d !important;
+        }
+
+        .heart-badge {
+            position: absolute;
+            top: -7px;
+            right: -8px;
+            background-color: #ff4d4d;
+            color: #ffffff;
+            font-size: 10px;
+            font-weight: bold;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transform: scale(0.5);
+            transition: all 0.3s ease;
+        }
+
+        .heart-wrapper.liked .heart-badge {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .cart-btn {
+            background-color: #7bc043;
+            color: white;
+            border: none;
+            padding: 20px 22px;
+            margin-right: -20px;
+            cursor: pointer;
+            height: 65px;
+            display: flex;
+            align-items: center;
+        }
+
+        @media (max-width: 767px) {
+            .task-tag, .device-switcher {
+                display: none !important;
+            }
+            .colorlib-preview-bar { padding: 0 15px; }
+            .right-side-controls { gap: 15px; }
+            .cart-btn { padding: 20px 18px; margin-right: -15px; }
+        }
+
+        /* ==========================================================================
+           RESPONSIVE VIEWPORT IFRAME HARNESS VIEW ENGINE
+           ========================================================================== */
+        .preview-window-container {
+            height: calc(100vh - 65px);
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #1a1a1a;
+            padding: 20px 0;
+        }
+
+        .site-iframe-wrapper {
+            width: 100%;
+            height: 100%;
+            max-width: 100%;
+            transition: max-width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            background-color: #0b0214;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.6);
+            border: 0 solid #333;
+        }
+
+        .site-iframe-wrapper.device-tablet {
+            max-width: 768px;
+            height: 95%;
+            border: 12px solid #333333;
+            border-radius: 24px;
+        }
+
+        .site-iframe-wrapper.device-mobile {
+            max-width: 375px;
+            height: 85%;
+            border: 12px solid #333333;
+            border-radius: 32px;
+        }
+        
+    </style>
+</head>
+<body>
+
+    <!-- 1. Colorlib Style Top Demo Preview Header State Bar -->
+    <header class="colorlib-preview-bar">
+        <div class="left-logo-area">
+            <a href="#" class="cl-logo">color<span>lib</span>.</a>
+            <div class="task-tag">+ STARTUP2</div>
+        </div>
+        
+        <div class="right-side-controls">
+            <div class="device-switcher">
+                <button class="device-btn active" onclick="switchDevice('desktop', this)">
+                    <i class="fa-solid fa-desktop"></i>
+                </button>
+                <button class="device-btn" onclick="switchDevice('tablet', this)">
+                    <i class="fa-solid fa-tablet-screen-button"></i>
+                </button>
+                <button class="device-btn" onclick="switchDevice('mobile', this)">
+                    <i class="fa-solid fa-mobile-button"></i>
+                </button>
+            </div>
+
+            <div class="right-actions">
+                <div class="heart-wrapper" id="heartToggleContainer" onclick="toggleHeartLike()">
+                    <i class="fa-solid fa-heart heart-icon fs-5"></i>
+                    <div class="heart-badge">1</div>
+                </div>
+                <button class="cart-btn">
+                    <i class="fa-solid fa-cart-shopping fs-5"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- 2. Interactive Main Viewport Display Area -->
+    <div class="preview-window-container">
+        <iframe class="site-iframe-wrapper" id="previewIframe" srcdoc='
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+                <style>
+                    body {
+                        font-family: sans-serif;
+                        margin: 0;
+                        background-color: #0b0214;
+                        overflow-x: hidden;
+                        overflow-y: auto;
+                    }
+                    .hero-section-wrapper {
+                        background: linear-gradient(135deg, #2b0b57 0%, #bd2c59 50%, #e06c39 100%) !important;
+                        min-height: 100vh;
+                        padding-top: 150px;
+                        display: flex;
+                        align-items: center;
+                    }
+                    .dynamic-nav {
+                        transition: background-color 0.3s, padding 0.3s;
+                        background-color: transparent;
+                    }
+                    .nav-scrolled {
+                        background-color: #111111 !important;
+                        padding-top: 12px !important;
+                        padding-bottom: 12px !important;
+                    }
+                    
+                    /* SERVICES CARD CSS */
+                    .services-section {
+                        background-color: #ffffff;
+                        padding: 100px 0;
+                    }
+                    .service-card {
+                        background: #ffffff;
+                        border: 1px solid #eeeeee;
+                        border-radius: 4px;
+                        padding: 60px 35px;
+                        transition: all 0.3s ease;
+                    }
+                    .icon-box {
+                        font-size: 45px;
+                        margin-bottom: 25px;
+                        display: inline-block;
+                        background: linear-gradient(135deg, #a855f7, #ec4899);
+                        -webkit-background-clip: text;
+                        -webkit-text-fill-color: transparent;
+                    }
+                    .service-card h3 {
+                        font-size: 24px;
+                        color: #222222;
+                        font-weight: 500;
+                        margin-bottom: 15px;
+                    }
+                    .service-card p {
+                        color: #777777;
+                        font-size: 15px;
+                        line-height: 1.6;
+                        margin: 0;
+                    }
+
+                    /* ABOUT US CSS */
+                    .about-section {
+                        background-color: #1a1a1a;
+                        color: #ffffff;
+                    }
+                    .about-img-col {
+                        min-height: 550px;
+                        background-image: url("https://images.unsplash.com/photo-1531403009284-440f080d1e12?auto=format&fit=crop&w=1000&q=80");
+                        background-size: cover;
+                        background-position: center;
+                    }
+                    .about-text-content {
+                        padding: 80px 60px;
+                    }
+                    .about-sub {
+                        font-size: 14px;
+                        font-weight: 600;
+                        color: #ffffff;
+                        display: block;
+                        margin-bottom: 20px;
+                        text-transform: capitalize;
+                    }
+                    .about-heading {
+                        font-size: 42px;
+                        font-weight: 600;
+                        line-height: 1.2;
+                        margin-bottom: 30px;
+                    }
+                    .about-p {
+                        color: #aaaaaa;
+                        font-size: 16px;
+                        line-height: 1.7;
+                        margin-bottom: 25px;
+                    }
+                    .about-blockquote {
+                        font-size: 16px;
+                        color: #ffffff;
+                        line-height: 1.6;
+                        border-left: 2px solid #5b61ef;
+                        padding-left: 20px;
+                        margin-bottom: 40px;
+                    }
+                    .btn-about {
+                        background-color: #5b61ef;
+                        color: white;
+                        border: none;
+                        padding: 14px 40px;
+                        border-radius: 30px;
+                        font-weight: 500;
+                        text-decoration: none;
+                        display: inline-block;
+                        transition: background 0.2s;
+                    }
+                    .btn-about:hover {
+                        background-color: #454ad1;
+                        color: white;
+                    }
+
+                    /* ==========================================================
+                       NEW: FEATURED WORK 5 DIV GRID LAYOUT CSS
+                       ========================================================== */
+                    .featured-section {
+                        background-color: #ffffff;
+                        padding: 100px 0;
+                    }
+                    .featured-title {
+                        font-size: 42px;
+                        font-weight: bold;
+                        color: #111111;
+                        margin-bottom: 15px;
+                    }
+                    .featured-subtitle {
+                        font-size: 16px;
+                        color: #777777;
+                        max-width: 600px;
+                        margin: 0 auto 60px auto;
+                        line-height: 1.6;
+                    }
+
+                    /* Custom Layout Wrapper via CSS Grid */
+                    .custom-work-grid {
+                        display: grid;
+                        gap: 30px;
+                        justify-content: center;
+                    }
+
+                  /* Row 1 Grid Map - Ab ye fix 500px/300px ki jagah 5:3 ke ratio me screen ke hisab se stretch hoga */
+.grid-row-top {
+    display: grid;
+    grid-template-columns: 5fr 3fr; /* Fix pixels ki jagah fractions use kiye */
+    gap: 30px;
+    width: 100%; /* Poori width cover karne ke liye */
+    max-width: 1140px; /* Bootstrap ka standard container width match karne ke liye */
+    margin: 0 auto;
+}
+
+/* Row 2 Grid Map - Ye automatic 3 barabar hisso me stretch hoga aur poori width lega */
+.grid-row-bottom {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 256px ki jagah 1fr (barabar hissay) use kiya */
+    gap: 30px;
+    width: 100%;
+    max-width: 1140px;
+    margin: 0 auto;
+}
+                    /* Work Item Container Box */
+                    .work-box {
+                        position: relative;
+                        height: 350px;
+                        border-radius: 8px;
+                        overflow: hidden;
+                        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+                    }
+                    .work-box img {
+                        width: 100%;
+                        height: 100%;
+                        object-fit: cover;
+                        transition: transform 0.5s ease;
+                    }
+
+                    /* Hover Overlay State Layer */
+                    .work-overlay {
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 100%;
+                        background: rgba(11, 2, 20, 0.9); /* Dark tech purple theme accent */
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: center;
+                        align-items: center;
+                        padding: 25px;
+                        text-align: center;
+                        opacity: 0;
+                        transition: opacity 0.4s ease;
+                    }
+                    .work-box:hover .work-overlay {
+                        opacity: 1;
+                    }
+                    .work-box:hover img {
+                        transform: scale(1.1);
+                    }
+
+                    /* Overlay Inside Content Tags */
+                    .overlay-tag {
+                        color: #ec4899;
+                        font-size: 13px;
+                        font-weight: 600;
+                        text-transform: uppercase;
+                        letter-spacing: 1px;
+                        margin-bottom: 5px;
+                    }
+                    .overlay-title {
+                        color: #ffffff;
+                        font-size: 22px;
+                        font-weight: 600;
+                        margin-bottom: 15px;
+                    }
+                    .overlay-desc {
+                        color: #cccccc;
+                        font-size: 14px;
+                        line-height: 1.5;
+                        margin-bottom: 25px;
+                    }
+                    .btn-view-work {
+                        background-color: #5b61ef;
+                        color: #ffffff;
+                        padding: 10px 30px;
+                        border-radius: 30px; /* Oval Design Button */
+                        font-size: 14px;
+                        font-weight: 500;
+                        text-decoration: none;
+                        transition: background-color 0.2s;
+                        border: none;
+                    }
+                    .btn-view-work:hover {
+                        background-color: #4247cc;
+                        color: #ffffff;
+                    }
+
+                    /* Responsive view adjustment overrides */
+                    @media (max-width: 900px) {
+                        .grid-row-top, .grid-row-bottom {
+                            grid-template-columns: 1fr !important;
+                            max-width: 100%;
+                            padding: 0 15px;
+                        }
+                        .work-box {
+                            height: 300px;
+                        }
+                    }
+
+                    @media (max-width: 991px) {
+                        .navbar-collapse {
+                            background-color: #111111 !important;
+                            padding: 20px;
+                            border-radius: 10px;
+                            margin-top: 10px;
+                        }
+                    }
+       /* Split Section Layout */
+        .how-we-work-section {
+            display: flex;
+            width: 100%;
+            min-height: 85vh; /* Thodi height barha di hai achi look ke liye */
+            align-items: center;
+            background-color: #ffffff; /* Section background bhi white */
+        }
+
+        /* Left Side Text Content */
+        .text-container {
+            flex: 1;
+            padding: 60px 8%; 
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .text-container h2 {
+            font-size: 3rem;
+            font-weight: 500;
+            margin-bottom: 25px;
+            color: #111111;
+        }
+
+        .text-container .quote {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            color: #222222;
+            font-weight: 400;
+        }
+
+        .text-container .description {
+            font-size: 1rem;
+            line-height: 1.7;
+            color: #666666;
+            max-width: 520px;
+        }
+
+        /* Right Side Image Content */
+        .image-container {
+            flex: 1;
+            align-self: stretch; 
+        }
+
+        .image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; 
+            display: block;
+        }
+
+        /* -----------------------------------------------
+           Strict Black Line Removal
+        -------------------------------------------------- */
+        /* Kisi bhi kism ki line, border ya separator ko hatane ke liye */
+        .how-we-work-section, .text-container, .image-container, body {
+            border: none !important;
+            border-bottom: none !important;
+            outline: none !important;
+            box-shadow: none !important;
+        }
+
+        /* Responsive Design for Mobile */
+        @media (max-width: 768px) {
+            .how-we-work-section {
+                flex-direction: column;
+            }
+            .text-container {
+                padding: 40px 24px;
+            }
+            .image-container {
+                height: 380px;
+                width: 100%;
+            }
+            .text-container h2 {
+                font-size: 2.3rem;
+            }
+        }
+        /* --- Our Creative Team Section Styles (Safe for Transparent Navbar) --- */
+/* --- Ultimate Full-Width White Section Fix --- */
+.team-section {
+    position: relative;
+    width: 100vw;               /* Screen ki puri width occupy karega */
+    left: 50%;
+    right: 50%;
+    margin-left: -50vw;        /* Parent container ke dark background ko break karke bahar nikalne ke liye */
+    margin-right: -50vw;
+    background-color: #ffffff !important; /* Forced Pure White */
+    padding: 80px 0;
+    text-align: center;
+    box-sizing: border-box;
+}
+
+/* Content wrapper jo team details ko center me rakhega */
+.team-container {
+    max-width: 1140px;
+    margin: 0 auto;
+    padding: 0 20px;
+    background-color: #ffffff !important;
+}
+
+.team-header h2 {
+    font-size: 2.8rem;
+    color: #111111;
+    font-weight: 600;
+    margin-bottom: 15px;
+}
+
+.team-header p {
+    font-size: 1.05rem;
+    color: #666666;
+    max-width: 650px;
+    margin: 0 auto 60px auto;
+    line-height: 1.6;
+}
+
+.team-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 30px;
+    background-color: #ffffff !important;
+}
+
+.team-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #ffffff !important;
+}
+
+.image-wrapper {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    margin-bottom: 20px;
+}
+
+.image-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.team-card h3 {
+    font-size: 1.25rem;
+    color: #111111;
+    font-weight: 500;
+    margin-bottom: 8px;
+}
+
+.team-card p {
+    font-size: 0.95rem;
+    color: #777777;
+}
+
+/* Any unintended borders or shadows elimination */
+.team-section, .team-container, .team-grid, .team-card, .image-wrapper {
+    border: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+/* Responsive Layout */
+@media (max-width: 992px) {
+    .team-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 576px) {
+    .team-grid {
+        grid-template-columns: 1fr;
+    }
+    .team-header h2 {
+        font-size: 2.2rem;
+    }
+}
+/* ==========================================================================
+           NEW: INTERACTIVE CONTACT US SECTION WITH ROUNDED FIELDS
+           ========================================================================== */
+        .contact-section {
+            background-color: #ffffff !important;
+            padding: 100px 0;
+            text-align: center;
+        }
+
+        .contact-container {
+            max-width: 850px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .contact-title {
+            font-size: 42px;
+            font-weight: bold;
+            color: #111111;
+            margin-bottom: 15px;
+        }
+
+        .contact-subtitle {
+            font-size: 16px;
+            color: #777777;
+            max-width: 600px;
+            margin: 0 auto 60px auto;
+            line-height: 1.6;
+        }
+
+        .contact-form {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 25px;
+        }
+
+        .form-group {
+            flex: 1;
+        }
+
+        /* Pill-shaped inputs mimicking image rendering */
+        .contact-form input,
+        .contact-form textarea {
+            width: 100%;
+            padding: 18px 30px;
+            font-size: 15px;
+            color: #222222;
+            background-color: #ffffff;
+            border: 1px solid #e5e5e5;
+            border-radius: 50px; /* Perfect rounded pillow shape */
+            outline: none;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        /* Message textarea slightly adjusted edge control */
+        .contact-form textarea {
+            border-radius: 25px;
+            resize: vertical;
+        }
+
+        /* Placeholders matched with system styling template */
+        .contact-form input::placeholder,
+        .contact-form textarea::placeholder {
+            color: #999999;
+        }
+
+        /* Input focus state logic matching corporate accents */
+        .contact-form input:focus,
+        .contact-form textarea:focus {
+            border-color: #5b61ef;
+            box-shadow: 0 0 0 4px rgba(91, 97, 239, 0.1);
+        }
+
+        /* Optional Accent Colored Submit Button */
+        .btn-submit-contact {
+            background-color: #5b61ef;
+            color: white;
+            border: none;
+            padding: 15px 45px;
+            border-radius: 30px;
+            font-weight: 500;
+            font-size: 15px;
+            cursor: pointer;
+            align-self: center;
+            transition: background-color 0.2s;
+        }
+
+        .btn-submit-contact:hover {
+            background-color: #454ad1;
+        }
+
+        /* Clean framework overrides */
+        .contact-section, .contact-container, .form-group {
+            border: none !important;
+            box-shadow: none !important;
+            outline: none !important;
+        }
+
+        /* Responsive Breakpoint for Mobile layout structures */
+        @media (max-width: 768px) {
+            .form-row {
+                flex-direction: column;
+                gap: 25px;
+            }
+            .contact-title {
+                font-size: 2.2rem;
+            }
+        }
+        /* ==========================================================================
+           BULLET-PROOF TESTIMONIAL BLOCK (No CSS Background Leakage)
+           ========================================================================== */
+        .testimonial-isolated-box {
+            width: 100% !important;
+            height: 500px !important; /* Strict fixed height */
+            position: relative !important;
+            overflow: hidden !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            background: #1a1a1a !important; /* Fallback dark background */
+        }
+
+        /* Image is treated as a normal HTML element locked inside 500px height */
+        .testimonial-bg-graphic {
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: cover !important;
+            z-index: 1 !important;
+            pointer-events: none !important;
+        }
+
+        /* Dark overlay strictly constrained inside this 500px box */
+        .testimonial-dark-overlay {
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            background: rgba(0, 0, 0, 0.75) !important;
+            z-index: 2 !important;
+        }
+
+        /* Content sitting safely on top */
+        .testimonial-safe-content {
+            position: relative !important;
+            z-index: 3 !important;
+            max-width: 850px;
+            width: 100%;
+            padding: 0 20px;
+            text-align: center;
+            box-sizing: border-box;
+        }
+
+        .t-quote-icon {
+            font-size: 35px;
+            color: #ffffff !important;
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+
+        .t-main-text {
+            font-size: 1.25rem;
+            line-height: 1.6;
+            color: #f5f5f5 !important;
+            margin: 0 auto 30px auto;
+            font-weight: 300;
+        }
+
+        .t-author-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .t-avatar-img {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            border: 2px solid #ffffff;
+            object-fit: cover;
+        }
+
+        .t-name-label {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #ffffff !important;
+            margin: 0;
+        }
+
+        .t-role-label {
+            font-size: 0.85rem;
+            color: #cccccc !important;
+            margin: 2px 0 0 0;
+        }
+        /* ==========================================================================
+           NEW: STARTUP FOOTER SECTION (9.png EXACT COPY)
+           ========================================================================== */
+        .site-footer-main {
+            background-color: #1a1a1a !important; /* Rich dark background matching 9.png */
+            padding: 80px 0 40px 0;
+            font-family: inherit;
+        }
+
+        .footer-top-row {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between; /* Keeps Left, Center, and Right perfectly aligned */
+            flex-wrap: wrap;
+            gap: 30px;
+        }
+
+        /* Left Side: Logo Branding */
+        .footer-brand-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+
+        .footer-brand-logo img {
+            height: 30px;
+            width: auto;
+        }
+
+        .footer-brand-text {
+            color: #ffffff !important;
+            font-size: 24px;
+            font-weight: bold;
+            letter-spacing: -0.5px;
+        }
+
+        /* Center: Nav links */
+        .footer-nav-center {
+            display: flex;
+            align-items: center;
+            gap: 35px;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .footer-nav-link {
+            color: #ffffff !important;
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 500;
+            transition: color 0.2s ease;
+        }
+
+        .footer-nav-link:hover {
+            color: #5b61ef !important; /* Theme accent on hover */
+        }
+
+        /* Right Side: Circular Social Buttons */
+        .footer-social-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .social-circle-btn {
+            width: 40px;
+            height: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff !important;
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .social-circle-btn:hover {
+            border-color: #ffffff;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Bottom Section: Separator and Copyright */
+        .footer-divider-line {
+            max-width: 1200px;
+            margin: 60px auto 30px auto;
+            border: 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.07); /* Thin subtle line */
+        }
+
+        .footer-copyright-note {
+            text-align: center;
+            color: #999999 !important;
+            font-size: 14px;
+            margin: 0;
+            padding: 0 20px;
+        }
+
+        .footer-copyright-note a {
+            color: #5b61ef !important; /* Colorlib link matching color */
+            text-decoration: none;
+        }
+
+        /* Responsive adaptations for mobile viewports */
+        @media (max-width: 991px) {
+            .footer-top-row {
+                flex-direction: column;
+                text-align: center;
+            }
+            .footer-nav-center {
+                flex-direction: column;
+                gap: 20px;
+            }
+            .footer-divider-line {
+                margin: 40px auto 30px auto;
+            }
+        }
+        /* ==========================================================================
+           UPDATED MOBILE LAYOUT: FORCING ROW-WISE LINKS FOR MOBILE SCREEN
+           ========================================================================== */
+        @media (max-width: 991px) {
+            .footer-top-row {
+                flex-direction: column;
+                text-align: center;
+                gap: 35px;
+            }
+
+            /* Forcing links to stay strictly in a single horizontal row */
+            .footer-nav-center {
+                flex-direction: row !important; 
+                flex-wrap: wrap; /* Agar screen bohot choti ho toh toot kar niche aaye par rahe row hi */
+                justify-content: center;
+                gap: 15px !important; /* Mobile par gap thoda kam kiya taake width fit ho */
+                padding: 0 10px;
+            }
+
+            .footer-nav-link {
+                font-size: 14px !important; /* Mobile friendly readable size */
+            }
+
+            .footer-divider-line {
+                margin: 40px auto 30px auto;
+            }
+        }
+        /* Desktop & Global Base Styling */
+/* Desktop & Global Base Styling */
+        .custom-responsive-btn {
+            background-color: #4b61ef !important;
+            border: none !important;
+            padding: 15px 45px !important; 
+            font-size: 1.25rem; 
+            display: inline-block; /* Margin property ko sahi se chalane ke liye */
+            margin-bottom: 30px !important; /* Desktop par bottom se thoda upar uthane ke liye */
+            transition: all 0.2s ease;
+        }
+
+        /* Mobile Screen Adjustment */
+        @media (max-width: 768px) {
+            .custom-responsive-btn {
+                padding: 10px 30px !important; 
+                font-size: 0.95rem !important;  
+                margin-bottom: 20px !important; /* Mobile par spacing adjust karne ke liye */
+            }
+        }
+        /* ==========================================================================
+           NEW: SECTION HEADER DESIGN (10.png EXACT COPY)
+           ========================================================================== */
+        .section-header-block {
+            text-align: center;
+            padding: 60px 20px 40px 20px;
+            max-width: 900px;
+            margin: 0 auto;
+            box-sizing: border-box;
+        }
+
+        /* Top small blue tag */
+        .section-header-tag {
+            color: #4b61ef !important; /* Blue color matching the button scheme */
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: capitalize;
+            letter-spacing: 0.5px;
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+
+        /* Big bold main title */
+        .section-header-title {
+            color: #222222 !important;
+            font-size: 42px;
+            font-weight: 500;
+            line-height: 1.4;
+            margin: 0 auto;
+            max-width: 800px; /* Text wrapper to force same lines layout */
+            letter-spacing: -0.5px;
+        }
+
+        /* Mobile Screens Setup */
+        @media (max-width: 768px) {
+            .section-header-title {
+                font-size: 28px; /* Mobile par automatic look text scaling */
+                line-height: 1.3;
+            }
+            .section-header-block {
+                padding: 40px 15px 20px 15px;
+            }
+        }
+        a {
+    cursor: pointer !important;
+}
+                </style>
+            </head>
+            <body>
+<!-- Header / Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark fixed-top dynamic-nav py-4" id="innerNavbar">
+    <div class="container">
+        <a class="navbar-brand fw-bold fs-3 text-white" href="#"><i class="fa-solid fa-bolt text-primary me-2"></i>Startup</a>
+        <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#innerMenu" aria-controls="innerMenu" aria-expanded="false">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        
+        <div class="collapse navbar-collapse" id="innerMenu">
+            <ul class="navbar-nav mx-auto gap-3 text-center">
+                <li class="nav-item"><a class="nav-link active text-white" >Home</a></li>
+                <li class="nav-item"><a class="nav-link text-white-50" >Services</a></li>
+                <li class="nav-item"><a class="nav-link text-white-50" >Portfolio</a></li>
+                <li class="nav-item"><a class="nav-link text-white-50" >Pages</a></li>
+                <li class="nav-item"><a class="nav-link text-white-50" >Blog</a></li>
+                <li class="nav-item"><a class="nav-link text-white-50">Contact</a></li>
+            </ul>
+            <div class="d-flex justify-content-center">
+                <a class="btn btn-outline-light rounded-pill px-4">Say Hello</a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+                <!-- Hero Section -->
+                <main class="hero-section-wrapper text-white">
+                    <div class="container">
+                        <div class="row align-items-center">
+                            <div class="col-lg-8 text-center text-lg-start">
+                                <h1 class="display-3 fw-bold mb-4" style="line-height: 1.2;">Startup you can build a website online using the</h1>
+                                <p class="lead text-white-50 mb-5 fs-5">Bootstrap builder framework tools natively inside your target device view ports.</p>
+<a  class="btn btn-primary btn-lg rounded-pill shadow-lg custom-responsive-btn">Visit Our Works</a>                            </div>
+                        </div>
+                    </div>
+                </main>
+
+                <!-- Services Section -->
+                <section class="services-section">
+                    <div class="container">
+                        <!-- ========================================== -->
+<!-- SECTION HEADER (As per 10.png) -->
+<!-- ========================================== -->
+<div class="section-header-block">
+    <span class="section-header-tag">Services</span>
+    <h2 class="section-header-title">
+        With more than 20 years of experience we can deliver the best product design.
+    </h2>
+</div>
+<!-- ========================================== -->
+                        <div class="row g-4 justify-content-center">
+                            <div class="col-md-4 text-center">
+                                <div class="service-card">
+                                    <div class="icon-box"><i class="fa-solid fa-layer-group"></i></div>
+                                    <h3>Graphic design</h3>
+                                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do eiusmod tempor.</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4 text-center">
+                                <div class="service-card">
+                                    <div class="icon-box"><i class="fa-solid fa-pen-ruler"></i></div>
+                                    <h3>Web design</h3>
+                                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do eiusmod tempor.</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4 text-center">
+                                <div class="service-card">
+                                    <div class="icon-box"><i class="fa-solid fa-cube"></i></div>
+                                    <h3>Mobile app</h3>
+                                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do eiusmod tempor.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- About Us Section -->
+                
+                <section class="about-section">
+                    <div class="container-fluid p-0">
+                        <div class="row g-0 align-items-center">
+                            <div class="col-lg-6 about-img-col"></div>
+                            <div class="col-lg-6">
+                                <div class="about-text-content">
+                                    <span class="about-sub">About Us</span>
+                                    <h2 class="about-heading">Empowering individuals</h2>
+                                    <p class="about-p">
+                                        Efficiently unleash cross-media tour function information without cross action media value. 
+                                        Quickly maximize timely deliverables for real-time schemas.
+                                    </p>
+                                    <div class="about-blockquote">
+                                        “Function information without cross action media value.
+                                    </div>
+                                    <a  class="btn-about">About Us</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- NEW SECTION: FEATURED WORK 5 DIV LAYOUT -->
+                <section class="featured-section text-center">
+                    <div class="container">
+                        
+                        <!-- Requested Section Headings -->
+                        <h2 class="featured-title">Feature work</h2>
+                        <p class="featured-subtitle">Tour function information without cross action media value quickly maximize timely deliverables.</p>
+                        
+                        <!-- Grid Master Wrapper -->
+                        <div class="custom-work-grid">
+                            
+                            <!-- Top Grid Row: 2 Divs (500px & 300px width config) -->
+                            <div class="grid-row-top">
+                                <!-- Div 1 (Width: 500px) -->
+                                <div class="work-box">
+                                    <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=600&q=80" alt="Work 1">
+                                    <div class="work-overlay">
+                                        <span class="overlay-tag">App Design</span>
+                                        <h4 class="overlay-title">Colorlib Mobile App</h4>
+                                        <p class="overlay-desc">Tour function information without cross action media value quickly.</p>
+                                        <a href="#" class="btn-view-work">View</a>
+                                    </div>
+                                </div>
+                                
+                                <!-- Div 2 (Width: 300px) -->
+                                <div class="work-box">
+                                    <img src="https://images.unsplash.com/photo-1558655146-d09347e92766?auto=format&fit=crop&w=400&q=80" alt="Work 2">
+                                    <div class="work-overlay">
+                                        <span class="overlay-tag">App Design</span>
+                                        <h4 class="overlay-title">Colorlib Mobile App</h4>
+                                        <p class="overlay-desc">Tour function information without cross action media value quickly.</p>
+                                        <a href="#" class="btn-view-work">View</a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Bottom Grid Row: 3 Divs (1 jtny width size config) -->
+                            <div class="grid-row-bottom">
+                                <!-- Div 3 -->
+                                <div class="work-box">
+                                    <img src="https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?auto=format&fit=crop&w=400&q=80" alt="Work 3">
+                                    <div class="work-overlay">
+                                        <span class="overlay-tag">App Design</span>
+                                        <h4 class="overlay-title">Colorlib Mobile App</h4>
+                                        <p class="overlay-desc">Tour function information without cross action media value quickly.</p>
+                                        <a href="#" class="btn-view-work">View</a>
+                                    </div>
+                                </div>
+                                
+                                <!-- Div 4 -->
+                                <div class="work-box">
+                                    <img src="https://images.unsplash.com/photo-1522542550221-31fd19575a2d?auto=format&fit=crop&w=400&q=80" alt="Work 4">
+                                    <div class="work-overlay">
+                                        <span class="overlay-tag">App Design</span>
+                                        <h4 class="overlay-title">Colorlib Mobile App</h4>
+                                        <p class="overlay-desc">Tour function information without cross action media value quickly.</p>
+                                        <a href="#" class="btn-view-work">View</a>
+                                    </div>
+                                </div>
+                                
+                                <!-- Div 5 -->
+                                <div class="work-box">
+                                    <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=400&q=80" alt="Work 5">
+                                    <div class="work-overlay">
+                                        <span class="overlay-tag">App Design</span>
+                                        <h4 class="overlay-title">Colorlib Mobile App</h4>
+                                        <p class="overlay-desc">Tour function information without cross action media value quickly.</p>
+                                        <a href="#" class="btn-view-work">View</a>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    
+                </section>
+                
+<section class="how-we-work-section">
+        
+        <div class="text-container">
+            <h2>How we work</h2>
+            <p class="quote">“Function information without cross action media value.</p>
+            <p class="description">
+                Efficiently unleash cross-media tour function information without cross action media value. Quickly maximize timely deliverables for real-time schemas.
+            </p>
+        </div>
+
+        <div class="image-container">
+            <img src="https://images.unsplash.com/photo-1593508512255-86ab42a8e620?auto=format&fit=crop&q=80&w=800" alt="Random Online Tech Image">
+        </div>
+
+    </section>
+<section class="team-section">
+    <div class="team-container">
+        
+        <div class="team-header">
+            <h2>Our Creative Team</h2>
+            <p>Tour function information without cross action media value quickly maximize timely deliverables.</p>
+        </div>
+
+        <div class="team-grid">
+            
+            <div class="team-card">
+                <div class="image-wrapper">
+                    <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=500" alt="Brandon Yeald">
+                </div>
+                <h3>Brandon Yeald</h3>
+                <p>Founder & CEO</p>
+            </div>
+
+            <div class="team-card">
+                <div class="image-wrapper">
+                    <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=500" alt="Calvin Anderson">
+                </div>
+                <h3>Calvin Anderson</h3>
+                <p>Graphics Designer</p>
+            </div>
+
+            <div class="team-card">
+                <div class="image-wrapper">
+                    <img src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&q=80&w=500" alt="Roman Solo">
+                </div>
+                <h3>Roman Solo</h3>
+                <p>Wordpress Developer</p>
+            </div>
+
+            <div class="team-card">
+                <div class="image-wrapper">
+                    <img src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&q=80&w=500" alt="Yeald Kin">
+                </div>
+                <h3>Yeald Kin</h3>
+                <p>Software Engineer</p>
+            </div>
+
+        </div>
+    </div>
+</section>
+<!-- ========================================== -->
+<!-- LOCKED 500PX TESTIMONIAL BLOCK -->
+<!-- ========================================== -->
+<div class="testimonial-isolated-box">
+    
+    <!-- Real image element instead of CSS background to prevent leakage -->
+    <img src="https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=1200&q=80" alt="Background" class="testimonial-bg-graphic">
+    
+    <!-- Dark shade layer -->
+    <div class="testimonial-dark-overlay"></div>
+    
+    <!-- Foreground Text content -->
+    <div class="testimonial-safe-content">
+        
+        <!-- Quote Icon (7.jpg copy) -->
+        <span class="t-quote-icon">
+            <i class="fa-solid fa-quote-right"></i>
+        </span>
+        
+        <!-- Main Quote Text -->
+        <p class="t-main-text">
+            Donec imperdiet congue orci consequat mattis. Donec rutrum porttitor sollicitudin. Pellentesque id dolor tempor sapien feugiat ultrices nec sed neque. Fusce ac mattis nulla. Morbi eget ornare dui.
+        </p>
+        
+        <!-- User Bio Info -->
+        <div class="t-author-card">
+            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80" alt="Robert Thomson" class="t-avatar-img">
+            <div>
+                <h4 class="t-name-label">Robert Thomson</h4>
+                <p class="t-role-label">Business Owner</p>
+            </div>
+        </div>
+
+    </div>
+</div>
+<!-- ========================================== -->
+<section class="contact-section">
+                    <div class="contact-container">
+                        <h2 class="contact-title">Get in Touch</h2>
+                        <p class="contact-subtitle">Tour function information without cross action media value quickly maximize timely deliverables.</p>
+                        
+                        <form class="contact-form" onsubmit="event.preventDefault();">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <input type="text" placeholder="Your Name" required>
+                                </div>
+                                <div class="form-group">
+                                    <input type="email" placeholder="Email" required>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <input type="text" placeholder="Subject" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <textarea placeholder="Message" rows="6" required></textarea>
+                            </div>
+                            
+                            <button type="submit" class="btn-submit-contact">Send Message</button>
+                        </form>
+                    </div>
+                </section>
+    </section>
+    <!-- ========================================== -->
+<!-- STARTUP BRAND FOOTER (As per 9.png) -->
+<!-- ========================================== -->
+<footer class="site-footer-main">
+    <div class="footer-top-row">
+        
+        <!-- Left Column: Logo Layout -->
+        <a href="#" class="footer-brand-logo">
+            <!-- Replace with actual logo image if available, right now using stylized icon + text matching 9.png -->
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M6 4L11 20H8L3 4H6Z" fill="#5b61ef"/>
+                <path d="M14 4L19 20H16L11 4H14Z" fill="#7d83ff"/>
+            </svg>
+            <span class="footer-brand-text">Startup</span>
+        </a>
+
+        <!-- Center Column: Navbar Links -->
+        <ul class="footer-nav-center">
+            <li><a href="#" class="footer-nav-link">About</a></li>
+            <li><a href="#" class="footer-nav-link">Services</a></li>
+            <li><a href="#" class="footer-nav-link">Portfolio</a></li>
+            <li><a href="#" class="footer-nav-link">Pages</a></li>
+            <li><a href="#" class="footer-nav-link">Blog</a></li>
+            <li><a href="#" class="footer-nav-link">Contact</a></li>
+        </ul>
+
+        <!-- Right Column: Wireframe Social Profile Links -->
+        <div class="footer-social-right">
+            <a  class="social-circle-btn"><i class="fa-brands fa-facebook-f"></i></a>
+            <a  class="social-circle-btn"><i class="fa-brands fa-twitter"></i></a>
+            <a  class="social-circle-btn"><i class="fa-brands fa-instagram"></i></a>
+            <a  class="social-circle-btn"><i class="fa-brands fa-google-plus-g"></i></a>
+        </div>
+
+    </div>
+
+    <!-- Thin Divider Line -->
+    <hr class="footer-divider-line">
+
+    <!-- Bottom Metadata row -->
+    <p class="footer-copyright-note">
+        Copyright ©2026 All rights reserved | This template is made with <i class="fa-regular fa-heart" style="color: #999;"></i> by <a href="https://colorlib.com" target="_blank">Colorlib</a>
+    </p>
+</footer>
+<!-- ========================================== -->
+                <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+                <script>
+                    window.addEventListener("scroll", () => {
+                        const nav = document.getElementById("innerNavbar");
+                        if (window.scrollY > 30) {
+                            nav.classList.add("nav-scrolled");
+                        } else {
+                            nav.classList.remove("nav-scrolled");
+                        }
+                    });
+                </script>
+            </body>
+            </html>
+        '></iframe>
+    </div>
+
+    <!-- Main Outer Window Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+    <script>
+        function switchDevice(deviceType, buttonElement) {
+            document.querySelectorAll('.device-btn').forEach(btn => btn.classList.remove('active'));
+            buttonElement.classList.add('active');
+            const iframe = document.getElementById('previewIframe');
+            iframe.className = 'site-iframe-wrapper';
+            
+            if (deviceType === 'tablet') {
+                iframe.classList.add('device-tablet');
+            } else if (deviceType === 'mobile') {
+                iframe.classList.add('device-mobile');
+            }
+        }
+
+        function toggleHeartLike() {
+            const heartWrapper = document.getElementById('heartToggleContainer');
+            heartWrapper.classList.toggle('liked');
+        }
+    </script>
+</body>
+</html>
